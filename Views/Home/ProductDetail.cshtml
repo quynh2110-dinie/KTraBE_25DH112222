@@ -1,0 +1,101 @@
+﻿
+@model WebApplication2.Models.Product
+
+@{
+    ViewBag.Title = "Chi tiết sản phẩm";
+    Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+}
+
+<style>
+    .detail-image {
+        width: 100%;
+        max-height: 400px;
+        object-fit: contain;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+    }
+
+    .detail-price {
+        color: #d9534f;
+        font-size: 28px;
+        font-weight: bold;
+        margin: 20px 0;
+    }
+
+    .detail-info {
+        font-size: 16px;
+        line-height: 2;
+    }
+</style>
+
+<h2>CHI TIẾT SẢN PHẨM</h2>
+<hr />
+
+<div class="row">
+
+    <div class="col-md-5">
+        @if (!string.IsNullOrEmpty(Model.ProductImage))
+        {
+            <img src="@Url.Content(
+                Model.ProductImage.StartsWith("~/")
+                ? Model.ProductImage
+                : "~/Content/Images/" +
+                  Model.ProductImage.TrimStart('/'))"
+                 class="detail-image"
+                 alt="@Model.ProductName" />
+        }
+        else
+        {
+            <div class="alert alert-info">
+                Sản phẩm chưa có hình ảnh.
+            </div>
+        }
+    </div>
+
+    <div class="col-md-7">
+
+        <h2>@Model.ProductName</h2>
+
+        <p class="detail-price">
+            @Model.ProductPrice.ToString("N0") đ
+        </p>
+
+        <div class="detail-info">
+
+            <p>
+                <strong>Danh mục:</strong>
+                @(Model.Category != null
+                    ? Model.Category.CategoryName
+                    : "Chưa phân loại")
+            </p>
+
+            <p>
+                <strong>Số lượng còn:</strong>
+                @Model.Quantity
+            </p>
+
+            <p>
+                <strong>Đã bán:</strong>
+                @Model.SoldQuantity
+            </p>
+
+            <p>
+                <strong>Mô tả:</strong>
+            </p>
+
+            <div class="well">
+                @Model.ProductDecription
+            </div>
+
+        </div>
+
+        @Html.ActionLink(
+                 "Quay lại danh sách",
+                 "ProductList",
+                 "Home",
+                 new { area = "" },
+                 new { @class = "btn btn-default" })
+
+    </div>
+</div>

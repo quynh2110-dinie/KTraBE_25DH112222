@@ -1,0 +1,89 @@
+﻿
+@model WebApplication2.Models.Customer
+
+@{
+    ViewBag.Title = "Sửa khách hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>CHỈNH SỬA KHÁCH HÀNG</h2>
+
+@using (Html.BeginForm("Edit", "Customers",
+    FormMethod.Post, new { area = "Admin" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.CustomerID)
+
+    <div class="form-horizontal">
+        <hr />
+
+        @Html.ValidationSummary(true, "",
+                 new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.CustomerName, "Họ tên",
+                     new { @class = "control-label col-md-2" })
+            <div class="col-md-6">
+                @Html.TextBoxFor(m => m.CustomerName,
+                         new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.CustomerName,
+                         "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.CustomerPhone, "Số điện thoại",
+                     new { @class = "control-label col-md-2" })
+            <div class="col-md-6">
+                @Html.TextBoxFor(m => m.CustomerPhone,
+                         new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.CustomerPhone,
+                         "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.CustomerEmail, "Email",
+                     new { @class = "control-label col-md-2" })
+            <div class="col-md-6">
+                @Html.TextBoxFor(m => m.CustomerEmail,
+                         new { @class = "form-control", type = "email" })
+                @Html.ValidationMessageFor(m => m.CustomerEmail,
+                         "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.CustomerAddress, "Địa chỉ",
+                     new { @class = "control-label col-md-2" })
+            <div class="col-md-6">
+                @Html.TextAreaFor(m => m.CustomerAddress,
+                         new { @class = "form-control", rows = 3 })
+                @Html.ValidationMessageFor(m => m.CustomerAddress,
+                         "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Tài khoản</label>
+            <div class="col-md-6">
+                <p class="form-control-static">@Model.Username</p>
+                <small>Tài khoản liên kết không được thay đổi ở đây.</small>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-6">
+                <button type="submit" class="btn btn-primary">
+                    Lưu thay đổi
+                </button>
+                @Html.ActionLink("Quay lại", "Index", null,
+                         new { @class = "btn btn-default" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

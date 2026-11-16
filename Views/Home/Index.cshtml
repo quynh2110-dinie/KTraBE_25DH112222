@@ -1,0 +1,138 @@
+﻿
+@model IEnumerable<WebApplication2.Models.Product>
+
+@{
+    ViewBag.Title = "Trang chủ";
+    Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+}
+
+<style>
+    .book-banner {
+        background: #f1f5fb;
+        padding: 45px 25px;
+        text-align: center;
+        margin-bottom: 30px;
+        border-radius: 8px;
+    }
+
+        .book-banner h1 {
+            color: #23527c;
+            font-weight: bold;
+        }
+
+    .book-card {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 25px;
+        text-align: center;
+        min-height: 340px;
+    }
+
+        .book-card img {
+            height: 180px;
+            width: 100%;
+            object-fit: contain;
+            margin-bottom: 12px;
+        }
+
+        .book-card h4 {
+            height: 42px;
+            overflow: hidden;
+        }
+
+    .book-price {
+        color: #d9534f;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>
+
+<div class="book-banner">
+    <h1>CHÀO MỪNG ĐẾN BOOKSTORE</h1>
+    <p>Khám phá những cuốn sách yêu thích của bạn</p>
+</div>
+
+<div class="row" style="margin-bottom:25px;">
+    <div class="col-md-8 col-md-offset-2">
+
+        @using (Html.BeginForm("Index", "Home",
+            FormMethod.Get))
+        {
+            <div class="input-group">
+                <input type="text"
+                       name="search"
+                       value="@ViewBag.Search"
+                       class="form-control"
+                       placeholder="Tìm kiếm sách..." />
+
+                <span class="input-group-btn">
+                    <button class="btn btn-primary"
+                            type="submit">
+                        Tìm kiếm
+                    </button>
+                </span>
+            </div>
+        }
+
+    </div>
+</div>
+
+<h2>SẢN PHẨM BOOKSTORE</h2>
+<hr />
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        Không tìm thấy sản phẩm nào.
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-3 col-sm-6">
+                <div class="book-card">
+
+                    @if (!string.IsNullOrEmpty(item.ProductImage))
+                    {
+                        <img src="@Url.Content(
+                            item.ProductImage.StartsWith("~/")
+                            ? item.ProductImage
+                            : "~/Content/Images/" +
+                              item.ProductImage.TrimStart('/'))"
+                             alt="@item.ProductName" />
+                    }
+                    else
+                    {
+                        <div style="height:180px;
+                                    padding-top:70px;
+                                    background:#eee;">
+                            Chưa có hình ảnh
+                        </div>
+                    }
+
+                    <h4>@item.ProductName</h4>
+
+                    <p class="book-price">
+                        @item.ProductPrice.ToString("N0") đ
+                    </p>
+
+                    <p>
+                        @Html.ActionLink(
+                                 "Xem chi tiết",
+                                 "ProductDetail",
+                                 "Home",
+                                 new { id = item.ProductID },
+                                 new
+                                 {
+                                     @class = "btn btn-primary"
+                                 })
+                    </p>
+
+                </div>
+            </div>
+        }
+    </div>
+}

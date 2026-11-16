@@ -1,0 +1,141 @@
+﻿
+@model WebApplication2.Models.Product
+
+@{
+    ViewBag.Title = "Thêm sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>THÊM SẢN PHẨM</h2>
+
+@using (Html.BeginForm("Create", "Products",
+    FormMethod.Post,
+    new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+
+        @Html.ValidationSummary(true, "",
+                 new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.ProductName,
+                     "Tên sản phẩm",
+                     new { @class = "control-label col-md-2" })
+
+            <div class="col-md-6">
+                @Html.TextBoxFor(m => m.ProductName,
+                         new { @class = "form-control" })
+
+                @Html.ValidationMessageFor(m => m.ProductName,
+                         "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.CategoryID,
+                     "Danh mục",
+                     new { @class = "control-label col-md-2" })
+
+            <div class="col-md-6">
+                @Html.DropDownList("CategoryID", null,
+                         "-- Chọn danh mục --",
+                         new { @class = "form-control" })
+
+                @Html.ValidationMessageFor(m => m.CategoryID,
+                         "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.ProductDecription,
+                     "Mô tả",
+                     new { @class = "control-label col-md-2" })
+
+            <div class="col-md-6">
+                @Html.TextAreaFor(m => m.ProductDecription,
+                         new
+                         {
+                             @class = "form-control",
+                             rows = 4
+                         })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.ProductPrice,
+                     "Giá bán",
+                     new { @class = "control-label col-md-2" })
+
+            <div class="col-md-6">
+                @Html.TextBoxFor(m => m.ProductPrice,
+                         new
+                         {
+                             @class = "form-control",
+                             type = "number",
+                             min = "0",
+                             step = "1"
+                         })
+
+                @Html.ValidationMessageFor(m => m.ProductPrice,
+                         "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Quantity,
+                     "Số lượng tồn",
+                     new { @class = "control-label col-md-2" })
+
+            <div class="col-md-6">
+                @Html.TextBoxFor(m => m.Quantity,
+                         new
+                         {
+                             @class = "form-control",
+                             type = "number",
+                             min = "0"
+                         })
+
+                @Html.ValidationMessageFor(m => m.Quantity,
+                         "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">
+                Hình ảnh
+            </label>
+
+            <div class="col-md-6">
+                <input type="file"
+                       name="imageFile"
+                       accept=".jpg,.jpeg,.png,.webp"
+                       class="form-control"
+                       required />
+
+                @Html.ValidationMessage("imageFile",
+                         new { @class = "text-danger" })
+
+                <small>Ảnh tối đa 5MB.</small>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-6">
+                <button type="submit"
+                        class="btn btn-success">
+                    Lưu sản phẩm
+                </button>
+
+                @Html.ActionLink("Quay lại", "Index", null,
+                         new { @class = "btn btn-default" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,168 @@
+﻿@model PagedList.IPagedList<WebApplication2.Models.Product>
+@using PagedList.Mvc
+
+@{
+    ViewBag.Title = "Quản lý sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>QUẢN LÝ SẢN PHẨM</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<p>
+    @Html.ActionLink("Thêm sản phẩm", "Create", null,
+            new { @class = "btn btn-success" })
+</p>
+
+@using (Html.BeginForm("Index", "Products",
+    FormMethod.Get, new { @class = "form-inline" }))
+{
+    <div class="form-group">
+        <input type="text"
+               name="search"
+               value="@ViewBag.Search"
+               placeholder="Nhập tên sản phẩm..."
+               class="form-control" />
+    </div>
+
+    <div class="form-group">
+        @Html.DropDownList(
+                 "categoryId",
+                 (SelectList)ViewBag.Categories,
+                 "-- Tất cả danh mục --",
+                 new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <select name="sortOrder" class="form-control">
+            <option value="">Tên A-Z</option>
+            <option value="name_desc"
+                    @(ViewBag.SortOrder == "name_desc" ? "selected" : "")>
+                Tên Z-A
+            </option>
+            <option value="price_asc"
+                    @(ViewBag.SortOrder == "price_asc" ? "selected" : "")>
+                Giá tăng dần
+            </option>
+            <option value="price_desc"
+                    @(ViewBag.SortOrder == "price_desc" ? "selected" : "")>
+                Giá giảm dần
+            </option>
+            <option value="newest"
+                    @(ViewBag.SortOrder == "newest" ? "selected" : "")>
+                Sản phẩm mới
+            </option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Tìm kiếm
+    </button>
+
+    @Html.ActionLink("Làm mới", "Index", null,
+            new { @class = "btn btn-default" })
+}
+
+<br />
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr class="bg-primary">
+            <th>Mã</th>
+            <th>Hình ảnh</th>
+            <th>Tên sản phẩm</th>
+            <th>Danh mục</th>
+            <th>Giá</th>
+            <th>Tồn kho</th>
+            <th>Đã bán</th>
+            <th>Chức năng</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ProductID</td>
+
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ProductImage))
+                    {
+                        <img src="@Url.Content("~/Content/images/" + item.ProductImage)"
+                             width="80"
+                             height="100"
+                             style="object-fit:cover" />
+                    }
+                    else
+                    {
+                        <span>Chưa có ảnh</span>
+                    }
+                </td>
+
+                <td>@item.ProductName</td>
+
+                <td>
+                    @(item.Category != null
+                        ? item.Category.CategoryName
+                        : "Chưa có")
+                </td>
+
+                <td>
+                    @String.Format("{0:N0} đ", item.ProductPrice)
+                </td>
+
+                <td>@item.Quantity</td>
+
+                <td>@item.SoldQuantity</td>
+
+                <td>
+                    @Html.ActionLink("Sửa", "Edit",
+                             new { id = item.ProductID },
+                             new { @class = "btn btn-warning btn-sm" })
+
+                    @Html.ActionLink("Chi tiết", "Details",
+                             new { id = item.ProductID },
+                             new { @class = "btn btn-info btn-sm" })
+
+                    @Html.ActionLink("Xóa", "Delete",
+                             new { id = item.ProductID },
+                             new { @class = "btn btn-danger btn-sm" })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        Không tìm thấy sản phẩm phù hợp.
+    </div>
+}
+
+<p>
+    Trang @(Model.PageCount < Model.PageNumber
+        ? 0 : Model.PageNumber) / @Model.PageCount
+    </p>
+
+    @Html.PagedListPager(Model, page => Url.Action("Index",
+        new
+        {
+            page,
+            search = ViewBag.Search,
+            categoryId = ViewBag.CategoryId,
+            sortOrder = ViewBag.SortOrder
+        }))

@@ -1,0 +1,73 @@
+﻿
+@model PagedList.IPagedList<WebApplication2.Models.User>
+@using PagedList.Mvc
+
+@{
+    ViewBag.Title = "Quản lý tài khoản Admin";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>QUẢN LÝ TÀI KHOẢN ADMIN</h2>
+
+<p>
+    @Html.ActionLink("Thêm tài khoản", "Create",
+            null, new { @class = "btn btn-success" })
+</p>
+
+@using (Html.BeginForm("Index", "Users",
+    FormMethod.Get))
+{
+    <div class="form-inline" style="margin-bottom:20px;">
+        <input type="text"
+               name="search"
+               value="@ViewBag.Search"
+               class="form-control"
+               placeholder="Nhập tên đăng nhập" />
+
+        <button type="submit" class="btn btn-primary">
+            Tìm kiếm
+        </button>
+    </div>
+}
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Tên đăng nhập</th>
+            <th>Vai trò</th>
+            <th>Chức năng</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Username</td>
+                <td>Admin</td>
+                <td>
+                    @Html.ActionLink("Chi tiết", "Details",
+                             new { id = item.Username },
+                             new { @class = "btn btn-info btn-sm" })
+
+                    @Html.ActionLink("Sửa", "Edit",
+                             new { id = item.Username },
+                             new { @class = "btn btn-warning btn-sm" })
+
+                    @Html.ActionLink("Xóa", "Delete",
+                             new { id = item.Username },
+                             new { @class = "btn btn-danger btn-sm" })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.PageCount > 1)
+{
+    @Html.PagedListPager(Model, page =>
+            Url.Action("Index", new
+            {
+                page,
+                search = ViewBag.Search
+            }))
+}

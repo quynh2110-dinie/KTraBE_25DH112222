@@ -1,0 +1,105 @@
+﻿
+@model WebApplication2.Models.Order
+
+@{
+    ViewBag.Title = "Đặt hàng thành công";
+    Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+}
+
+<div class="text-center" style="margin:35px 0;">
+    <h2 class="text-success">ĐẶT HÀNG THÀNH CÔNG!</h2>
+    <p>BookStore đã ghi nhận đơn hàng của bạn.</p>
+    <h3>Mã đơn hàng: #@Model.OrderID</h3>
+</div>
+
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <strong>Thông tin đơn hàng</strong>
+    </div>
+
+    <div class="panel-body">
+        <p>
+            <strong>Ngày đặt:</strong>
+            @Model.OrderDate
+        </p>
+
+        <p>
+            <strong>Địa chỉ nhận hàng:</strong>
+            @Model.AddressDelivery
+        </p>
+
+        <p>
+            <strong>Thanh toán:</strong>
+            @Model.PaymentMethod
+        </p>
+
+        <p>
+            <strong>Giao hàng:</strong>
+            @Model.DeliveryMethod
+        </p>
+
+        <p>
+            <strong>Trạng thái:</strong>
+            @Model.OrderStatus
+        </p>
+
+        <h3>Danh sách sản phẩm</h3>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Tên sản phẩm</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá</th>
+                    <th>Thành tiền</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model.OrderDetail)
+                {
+                    <tr>
+                        <td>
+                            @(item.Product != null
+                                ? item.Product.ProductName
+                                : "Sản phẩm")
+                        </td>
+
+                        <td>@item.Quantity</td>
+
+                        <td>
+                            @item.UnitPrice.ToString("N0") đ
+                        </td>
+
+                        <td>
+                            @String.Format("{0:N0}", item.SubTotal) đ
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h3 class="text-right">
+            Tổng tiền:
+            <span class="text-danger">
+                @Model.TotalAmount.ToString("N0") đ
+            </span>
+        </h3>
+    </div>
+</div>
+
+<div class="text-center">
+    @Html.ActionLink(
+            "Tiếp tục mua sắm",
+            "ProductList",
+            "Home",
+            null,
+            new { @class = "btn btn-primary" })
+
+    @Html.ActionLink(
+            "Lịch sử mua hàng",
+            "OrderHistory",
+            "Order",
+            null,
+            new { @class = "btn btn-default" })
+</div>

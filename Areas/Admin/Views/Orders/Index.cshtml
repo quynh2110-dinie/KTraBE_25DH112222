@@ -1,0 +1,168 @@
+﻿
+@model PagedList.IPagedList<WebApplication2.Models.Order>
+@using PagedList.Mvc
+
+@{
+    ViewBag.Title = "Quản lý đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>QUẢN LÝ ĐƠN HÀNG</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+@using (Html.BeginForm("Index", "Orders", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-md-3">
+            <label>Tên khách hàng</label>
+            <input type="text"
+                   name="search"
+                   value="@ViewBag.Search"
+                   class="form-control"
+                   placeholder="Nhập tên khách hàng" />
+        </div>
+
+        <div class="col-md-3">
+            <label>Trạng thái thanh toán</label>
+            <select name="paymentStatus" class="form-control">
+                <option value="">Tất cả</option>
+                @foreach (string status in
+                    (IEnumerable<string>)ViewBag.PaymentStatuses)
+                {
+                    <option value="@status"
+                            @(ViewBag.PaymentStatus == status ? "selected" : "")>
+                        @status
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label>Ngày đặt hàng</label>
+            <input type="date"
+                   name="orderDate"
+                   value="@ViewBag.OrderDate"
+                   class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label>Sắp xếp</label>
+            <select name="sortOrder" class="form-control">
+                <option value="">Mới nhất</option>
+                <option value="date_asc"
+                        @(ViewBag.SortOrder == "date_asc" ? "selected" : "")>
+                    Cũ nhất
+                </option>
+                <option value="total_asc"
+                        @(ViewBag.SortOrder == "total_asc" ? "selected" : "")>
+                    Tổng tiền tăng dần
+                </option>
+                <option value="total_desc"
+                        @(ViewBag.SortOrder == "total_desc" ? "selected" : "")>
+                    Tổng tiền giảm dần
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-primary">
+        Tìm kiếm
+    </button>
+
+    @Html.ActionLink("Làm mới", "Index", null,
+            new { @class = "btn btn-default" })
+}
+
+<hr />
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr class="bg-primary">
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Ngày đặt</th>
+                <th>Tổng tiền</th>
+                <th>Thanh toán</th>
+                <th>Trạng thái đơn</th>
+                <th>Chức năng</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.OrderID</td>
+
+                    <td>
+                        @(item.Customer != null
+                            ? item.Customer.CustomerName
+                            : "Không xác định")
+                    </td>
+
+                    <td>
+                        @String.Format("{0:dd/MM/yyyy HH:mm}",
+                                 item.OrderDate)
+                    </td>
+
+                    <td>
+                        @String.Format("{0:N0} đ",
+                                 item.TotalAmount)
+                    </td>
+
+                    <td>@item.PaymentStatus</td>
+
+                    <td>@item.OrderStatus</td>
+
+                    <td>
+                        @Html.ActionLink(
+                                 "Chi tiết / Cập nhật",
+                                 "Details",
+                                 new { id = item.OrderID },
+                                 new { @class = "btn btn-info btn-sm" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        KHÔNG CÓ ĐƠN HÀNG PHÙ HỢP.
+    </div>
+}
+
+<p>Tổng số đơn hàng: @Model.TotalItemCount</p>
+
+<p>
+    Trang @(Model.PageCount < Model.PageNumber
+        ? 0 : Model.PageNumber) / @Model.PageCount
+    </p>
+
+    @Html.PagedListPager(Model, page => Url.Action("Index",
+        new
+        {
+            page,
+            search = ViewBag.Search,
+            paymentStatus = ViewBag.PaymentStatus,
+            orderDate = ViewBag.OrderDate,
+            sortOrder = ViewBag.SortOrder
+        }))

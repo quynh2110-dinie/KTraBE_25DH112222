@@ -1,0 +1,222 @@
+﻿
+@model PagedList.IPagedList<WebApplication2.Models.Product>
+@using PagedList.Mvc
+@using System.Linq
+
+@{
+    ViewBag.Title = "Danh sách sản phẩm";
+    Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+
+    var categories = ViewBag.Categories
+        as IEnumerable<WebApplication2.Models.Category>;
+
+    string sortOrder = ViewBag.SortOrder as string ?? "";
+}
+
+<style>
+    .category-menu {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+        .category-menu a {
+            display: block;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            text-decoration: none;
+        }
+
+            .category-menu a:hover {
+                background: #f5f5f5;
+            }
+
+    .product-card {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+        text-align: center;
+        min-height: 340px;
+    }
+
+        .product-card img {
+            width: 100%;
+            height: 170px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .product-card h4 {
+            height: 42px;
+            overflow: hidden;
+        }
+
+    .product-price {
+        color: #d9534f;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>
+
+<h2>DANH SÁCH SẢN PHẨM</h2>
+<hr />
+
+<div class="row">
+
+    <div class="col-md-3">
+        <div class="category-menu">
+            <h4>DANH MỤC SÁCH</h4>
+
+            @Html.ActionLink(
+                     "Tất cả sản phẩm",
+                     "ProductList",
+                     "Home",
+                     new { area = "" },
+                     null)
+
+            @if (categories != null)
+            {
+                foreach (var category in categories)
+                {
+                    @Html.ActionLink(
+                             category.CategoryName,
+                             "ProductList",
+                             "Home",
+                             new
+                             {
+                                 area = "",
+                                 categoryId = category.CategoryID
+                             },
+                             null)
+                }
+            }
+        </div>
+    </div>
+
+    <div class="col-md-9">
+
+        @using (Html.BeginForm(
+            "ProductList", "Home", FormMethod.Get))
+        {
+            <input type="hidden"
+                   name="categoryId"
+                   value="@ViewBag.CategoryId" />
+
+            <div class="row" style="margin-bottom:20px;">
+
+                <div class="col-md-5">
+                    <input type="text"
+                           name="search"
+                           value="@ViewBag.Search"
+                           class="form-control"
+                           placeholder="Tìm kiếm sách..." />
+                </div>
+
+                <div class="col-md-4">
+                    <select name="sortOrder"
+                            class="form-control">
+                        <option value=""
+                                @(sortOrder == "" ? "selected" : "")>
+                            Tên A-Z
+                        </option>
+
+                        <option value="name_desc"
+                                @(sortOrder == "name_desc" ? "selected" : "")>
+                            Tên Z-A
+                        </option>
+
+                        <option value="price_asc"
+                                @(sortOrder == "price_asc" ? "selected" : "")>
+                            Giá tăng dần
+                        </option>
+
+                        <option value="price_desc"
+                                @(sortOrder == "price_desc" ? "selected" : "")>
+                            Giá giảm dần
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <button type="submit"
+                            class="btn btn-primary btn-block">
+                        Tìm kiếm
+                    </button>
+                </div>
+
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                Không tìm thấy sản phẩm nào.
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-4 col-sm-6">
+                        <div class="product-card">
+
+                            @if (!string.IsNullOrEmpty(item.ProductImage))
+                            {
+                                <img src="@Url.Content(
+                                    item.ProductImage.StartsWith("~/")
+                                    ? item.ProductImage
+                                    : "~/Content/Images/" +
+                                      item.ProductImage.TrimStart('/'))"
+                                     alt="@item.ProductName" />
+                            }
+                            else
+                            {
+                                <div style="height:170px;
+                                            padding-top:65px;
+                                            background:#eee;">
+                                    Chưa có hình ảnh
+                                </div>
+                            }
+
+                            <h4>@item.ProductName</h4>
+
+                            <p class="product-price">
+                                @item.ProductPrice.ToString("N0") đ
+                            </p>
+
+                            @Html.ActionLink(
+                                     "Xem chi tiết",
+                                     "ProductDetail",
+                                     "Home",
+                                     new
+                                     {
+                                         area = "",
+                                         id = item.ProductID
+                                     },
+                                     new
+                                     {
+                                         @class = "btn btn-primary"
+                                     })
+
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="text-center">
+                @Html.PagedListPager(Model, page =>
+                         Url.Action("ProductList", new
+                         {
+                             page,
+                             categoryId = ViewBag.CategoryId,
+                             search = ViewBag.Search,
+                             sortOrder = ViewBag.SortOrder
+                         }))
+            </div>
+        }
+
+    </div>
+</div>
